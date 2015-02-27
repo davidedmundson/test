@@ -39,9 +39,12 @@
 #include <kscreen/config.h>
 #include <kscreen/getconfigoperation.h>
 
+#include <KLocalizedString>
+#include <KSharedConfig>
+#include <KConfigGroup>
+
 #include <QtCore/QDir>
 #include <QStandardPaths>
-#include <KLocalizedString>
 #include <QComboBox>
 #include <QPushButton>
 #include <QQuickView>
@@ -90,7 +93,21 @@ Widget::Widget(QWidget *parent):
     hbox->addWidget(new QLabel(i18n("Primary display:")));
     hbox->addWidget(mPrimaryCombo);
 
+
     hbox->addStretch();
+
+    QHBoxLayout *hbox2 = new QHBoxLayout;
+    vbox->addLayout(hbox2);
+
+    mScaleCombo = new QComboBox(this);
+    mScaleCombo->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    mScaleCombo->addItem(i18n("No scaling"), "1");
+    mScaleCombo->addItem(i18nc("Double","2X"), "2");
+    mScaleCombo->addItem(i18n("Auto"), "auto");
+    hbox2->addWidget(mScaleCombo);
+    hbox2->addStretch();
+    vbox->addWidget(new QLabel(i18n("Scaling changes may only take effect after restart")));
+    connect(mScaleCombo, SIGNAL(currentIndexChanged(int)), this, SIGNAL(changed()));
 
 #ifdef WITH_PROFILES
     mProfilesModel = new ProfilesModel(this);
@@ -203,6 +220,8 @@ void Widget::loadQml()
         return;
     }
     mScreen->setEngine(m_declarativeView->engine());
+
+    mScaleCombo->setCurrentIndex(mScaleCombo->findData(KSharedConfig::openConfig("kdeglobals")->group("KScreen").readEntry("ScaleFactor")));;
 
     connect(mScreen, &QMLScreen::focusedOutputChanged,
             this, &Widget::slotFocusedOutputChanged);
@@ -530,3 +549,9 @@ void Widget::slotIdentifyOutputs(KScreen::ConfigOperation *op)
 
     mOutputTimer->start(2500);
 }
+
+void Widget::saveScaleRatio()
+{
+    KSharedConfig::openConfig("kdeglobals")->group("KScreen").writeEntry("ScaleFactor", mScaleCombo->currentData().toString());
+}
+

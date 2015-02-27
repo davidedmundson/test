@@ -51,6 +51,7 @@ KCMKScreen::KCMKScreen(QWidget* parent, const QVariantList& args)
     , mKScreenWidget(0)
 {
     setButtons(Apply | Default);
+    new QVBoxLayout(this);
 
     KAboutData* about =
         new KAboutData(QStringLiteral("kcm_kscreen"),
@@ -66,20 +67,19 @@ KCMKScreen::KCMKScreen(QWidget* parent, const QVariantList& args)
 
 void KCMKScreen::configReady(ConfigOperation* op)
 {
-    QHBoxLayout *layout = new QHBoxLayout(this);
 
     if (op->hasError()) {
         mKScreenWidget = 0;
         delete mKScreenWidget;
         QLabel *errorLabel = new QLabel(this);
-        layout->addWidget(errorLabel);
+        layout()->addWidget(errorLabel);
         errorLabel->setText(i18n("No kscreen backend found. Please check your kscreen installation."));
         return;
     }
 
     mKScreenWidget = new Widget(this);
     mKScreenWidget->setConfig(qobject_cast<GetConfigOperation*>(op)->config());
-    layout->addWidget(mKScreenWidget);
+    layout()->addWidget(mKScreenWidget);
 
     connect(mKScreenWidget, SIGNAL(changed()),
             this, SLOT(changed()));
@@ -140,6 +140,8 @@ void KCMKScreen::save()
     /* Block until the operation is completed, otherwise KCMShell will terminate
      * before we get to execute the Operation */
     op->exec();
+
+    mKScreenWidget->saveScaleRatio();
 }
 
 void KCMKScreen::defaults()

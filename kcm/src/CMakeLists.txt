@@ -24,6 +24,7 @@ target_link_libraries(kcm_kscreen
     Qt5::X11Extras
     KF5::Screen
     KF5::I18n
+    KF5::ConfigCore
     KF5::ConfigWidgets
 )
 
@@ -35,6 +36,7 @@ target_link_libraries(kcm_testapp
         Qt5::QuickWidgets
         Qt5::Widgets
         KF5::CoreAddons
+        KF5::ConfigCore
         KF5::I18n
         KF5::Screen
 )

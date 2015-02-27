@@ -51,6 +51,8 @@ class Widget : public QWidget
     void setConfig(const KScreen::ConfigPtr &config);
     KScreen::ConfigPtr currentConfig() const;
 
+    void saveScaleRatio();
+
   protected:
     virtual bool eventFilter(QObject *object, QEvent *event);
 
@@ -92,6 +94,7 @@ class Widget : public QWidget
     ProfilesModel *mProfilesModel;
     QComboBox *mPrimaryCombo;
     QComboBox *mProfilesCombo;
+    QComboBox *mScaleCombo;
 
     QPushButton *mUnifyButton;
     QPushButton *mSaveProfileButton;
